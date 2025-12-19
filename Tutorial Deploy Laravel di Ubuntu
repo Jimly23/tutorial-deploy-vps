@@ -1,40 +1,54 @@
-# Panduan Deploy Project Laravel di VPS
-
-Dokumen ini berisi langkah-langkah lengkap untuk melakukan deploy project **Laravel** ke **VPS** menggunakan **Nginx**, **PHP-FPM**, dan **MySQL**.
-
----
-
-## Prasyarat
-Pastikan VPS sudah terinstall:
-- PHP (contoh: PHP 8.2)
-- Composer
-- Nginx
-- MySQL / MariaDB
-- Git
-
----
-
-## 1. Masuk ke Folder `/var/www` dan Buat Folder Project
-```bash
+1. Masuk ke Folder `/var/www` dan Buat Folder Project
+```
 cd /var/www
 sudo mkdir nama_folder
 cd nama_folder
+```
+2. Clone Repository Project Laravel
+```
 sudo git clone link_github
 cd nama-project
+```
+3. Konfigurasi File .env
+```
 cp .env.example .env
 nano .env
+```
+4. Ubah konfigurasi database sesuai VPS:
+```
 DB_DATABASE=nama_database
 DB_USERNAME=username_database
 DB_PASSWORD=password_database
+
+simpan perubahan dengan menekan ctrl+o kemudian enter, lalu untuk keluar tekan ctrl+x lalu enter
+```
+5. Install Dependency Laravel
+```
 composer install
-http://IP_VPS/phpMyAdmin
+```
+6. Buat database
+```
 mysql -u root -p
 CREATE DATABASE nama_database;
+```
+7. Generate Application Key
+```
 php artisan key:generate
+```
+8. Jalankan migrasi database
+```
 php artisan migrate
+```
+9. Set permission folder laravel
+```
 sudo chown -R www-data:www-data storage bootstrap/cache
 sudo chmod -R 775 storage bootstrap/cache
+```
+10. Konfigurasi nginx
+```
 sudo nano /etc/nginx/sites-available/nama_file
+
+isi konfigurasi:
 server {
     listen 80;
     listen [::]:80;
@@ -67,7 +81,14 @@ server {
         deny all;
     }
 }
+```
+11. Aktifkan konfigurasi nginx
+```
 sudo ln -s /etc/nginx/sites-available/nama_file /etc/nginx/sites-enabled
 sudo nginx -t
 sudo systemctl reload nginx
+```
+12. Akses aplikasi
+```
 http://domain-anda.com
+```
